@@ -15,8 +15,8 @@ require __DIR__ . '/../app/controllers/UserController.php';
 require __DIR__ . '/../app/middleware/JwtMiddleware.php';
 
 
-Flight::route('POST /users/register', ['UserController', 'register']);
-Flight::route('POST /users/login', ['UserController', 'login']);
+Flight::route('POST /auth/register', ['UserController', 'register']);
+Flight::route('POST /auth/login', ['UserController', 'login']);
 
 Flight::route('GET /users/info', function () {
     JwtMiddleware::verify();
@@ -35,7 +35,7 @@ Flight::route('GET /users/info', function () {
     }
 });
 
-Flight::route('POST /deposit', function() {
+Flight::route('POST /transactions/deposit', function() {
     $data = Flight::request()->data->getData();
     $depositAmount = $data['amount'];
 
