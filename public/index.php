@@ -35,6 +35,40 @@ Flight::route('GET /users/info', function () {
     }
 });
 
+Flight::route('POST /deposit', function() {
+    $data = Flight::request()->data->getData();
+    $depositAmount = $data['amount'];
+
+    if (!isset($depositAmount) || $depositAmount <= 0) {
+        Flight::response()->status(400);
+        Flight::json(['error' => 'Invalid deposit amount']);
+        return;
+    }
+
+    JwtMiddleware::verify(); 
+    $userId = Flight::get('userId');
+
+    $db = Database::getInstance();
+    try {
+        $db->beginTransaction();
+
+        $stmt = $db->prepare("INSERT INTO transactions (user_id, type, amount) VALUES (:userId, 'deposit', :amount)");
+        $stmt->bindParam(':userId', $userId);
+        $stmt->bindParam(':amount', $depositAmount);
+        $stmt->execute();
+
+        $db->commit();
+
+        Flight::json(['message' => 'Deposit successful']);
+    } catch (Exception $e) {
+        $db->rollBack();
+        Flight::response()->status(500);
+        Flight::json(['error' => 'Failed to process deposit: ' . $e->getMessage()]);
+    }
+});
+
+
+
 
 
 Flight::route('GET /test', function() {
