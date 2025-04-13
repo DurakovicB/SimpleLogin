@@ -16,6 +16,13 @@ class UserController {
             return;
         }
 
+        $emailDomain = substr(strrchr($data['email'], "@"), 1); 
+
+        if (!checkdnsrr($emailDomain, "MX")) {
+            Flight::json(['error' => 'Email domain does not accept emails'], 400);
+            return;
+        }
+
         if (strlen($data['password']) < 6) {
             Flight::json(['error' => 'Password must have at least 6 characters'], 400);
             return;
@@ -63,6 +70,11 @@ class UserController {
             return;
         }
 
+        if (!preg_match('/^[a-zA-Z0-9_]+$/', $data['username'])){
+            Flight::json(['error' => 'Username must only have letters, numbers, and underscores'], 400);
+            return;
+        }
+
         $usernameCheckSql = "SELECT COUNT(*) FROM users WHERE username = :username";
         $usernameCheckStmt = $db->prepare($usernameCheckSql);
         $usernameCheckStmt->bindParam(':username', $data['username']);
@@ -90,6 +102,12 @@ class UserController {
 
     public function login() {
         $data = Flight::request()->data->getData();
+
+        $data['email'] = isset($data['email']) ? strtolower(trim($data['email'])) : null;
+        $data['username'] = isset($data['username']) ? trim($data['username']) : null;
+        $data['password'] = isset($data['password']) ? trim($data['password']) : null;
+
+
 
         if ((empty($data['email']) && empty($data['username'])) || empty($data['password'])) {
             Flight::json(['error' => 'Email/username and password are required'], 400);
