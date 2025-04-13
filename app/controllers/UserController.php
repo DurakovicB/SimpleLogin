@@ -1,11 +1,12 @@
 <?php
-    use \Firebase\JWT\JWT;
+use \Firebase\JWT\JWT;
+use ZxcvbnPhp\Zxcvbn;
 
 class UserController {
     public function register() {
         $data = Flight::request()->data->getData();
 
-        if (empty($data['email']) || empty($data['password'] || empty($data['username']))) {
+        if (empty($data['email']) || empty($data['password']) || empty($data['username'])) {
             Flight::json(['error' => 'Email, password, and username are required'], 400);
             return;
         }
@@ -20,6 +21,26 @@ class UserController {
             return;
         }
 
+        $passHasLower = preg_match('/[a-z]/', $data['password']);
+        $passHasUpper = preg_match('/[A-Z]/', $data['password']);
+        $passHasDigit = preg_match('/[0-9]/', $data['password']);
+        $passHasSpecial = preg_match('/[\W_]/', $data['password']);
+
+        if (!($passHasLower && $passHasUpper && $passHasDigit && $passHasSpecial)){
+            Flight::json(['error' => 'Password must include uppercase, lowercase, digit, and special characters.'], 400);
+            return;
+        }
+
+
+        $zxcvbn = new Zxcvbn();
+        $strength = $zxcvbn->passwordStrength($data['password']);
+
+        if ($strength['score'] < 3) {
+            Flight::json(['error' => 'Password is too weak.'], 400);
+            return;
+        }
+
+
         $db = Database::getInstance();
 
         $emailCheckSql = "SELECT COUNT(*) FROM users WHERE email = :email";
@@ -29,6 +50,16 @@ class UserController {
 
         if ($emailCheckStmt->fetchColumn() > 0) {
             Flight::json(['error' => 'Email already exists'], 409);
+            return;
+        }
+
+        if (strlen($data['username']) < 4) {
+            Flight::json(['error' => 'Username must have at least 4 characters'], 400);
+            return;
+        }
+
+        if (strlen($data['username']) > 20) {
+            Flight::json(['error' => 'Username must not have more than 20 characters'], 400);
             return;
         }
 
