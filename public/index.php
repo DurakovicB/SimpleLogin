@@ -37,16 +37,24 @@ Flight::route('GET /users/info', function () {
 
 Flight::route('POST /transactions/deposit', function() {
     $data = Flight::request()->data->getData();
-    $depositAmount = $data['amount'];
 
-    if (!isset($depositAmount) || $depositAmount <= 0) {
+    if (!isset($data['amount'])){
+        Flight::response()->status(400);
+        Flight::json(['error' => 'Deposit amount missing']);
+        return;
+    }
+
+    if($data['amount'] <= 0) {
         Flight::response()->status(400);
         Flight::json(['error' => 'Invalid deposit amount']);
         return;
     }
 
     JwtMiddleware::verify(); 
-    $userId = Flight::get('userId');
+    $userId = Flight::get('userId');    
+    if (!$userId) {
+        return; 
+    }
 
     $db = Database::getInstance();
     try {
@@ -54,7 +62,7 @@ Flight::route('POST /transactions/deposit', function() {
 
         $stmt = $db->prepare("INSERT INTO transactions (user_id, type, amount) VALUES (:userId, 'deposit', :amount)");
         $stmt->bindParam(':userId', $userId);
-        $stmt->bindParam(':amount', $depositAmount);
+        $stmt->bindParam(':amount', $data['amount']);
         $stmt->execute();
 
         $db->commit();
