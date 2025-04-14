@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document outlines the work completed during the 7-day Junior Backend Developer test as part of the Power Commerce interview process. The goal was to build a simple backend system capable of handling user authentication, transaction management, and account summary retrieval.
+This document outlines the work completed during the 7-day Junior Backend Developer test that I took as part of the Power Commerce interview process. The goal was to build a simple backend system capable of handling user authentication, transaction management, and account summary retrieval.
 
 ---
 
@@ -138,11 +138,11 @@ This document outlines the work completed during the 7-day Junior Backend Develo
 
     ***For Bash/Linux/Mac:***
     ```bash
-    ./vendor/bin/phpunit --debug
+    ./vendor/bin/phpunit 
     ```
 
     ***For Windows CMD:***
     ```cmd
-    php -d memory_limit=512M vendor\bin\phpunit --debug
+    php -d memory_limit=512M vendor\bin\phpunit 
     ```
-    - Using --debug will show which tests are being run.
+    - Using --debug after these commands will show which tests are being run.

@@ -8,7 +8,9 @@
  *     description="Deposits a specified amount into the user's account after validating the amount and performing necessary checks.",
  *     operationId="deposit",
  *     tags={"Transactions"},
- *     requestBody={
+ *     security={{"BearerAuth":{}}},
+ *     @OA\RequestBody(
+ *         required=true,
  *         @OA\MediaType(
  *             mediaType="application/json",
  *             @OA\Schema(
@@ -18,44 +20,39 @@
  *                     property="amount",
  *                     type="number",
  *                     format="float",
- *                     description="The amount to deposit"
+ *                     description="The amount to deposit",
+ *                     example=150.00
  *                 )
  *             )
  *         )
- *     },
- *     responses={
- *         @OA\Response(
- *             response="200",
- *             description="Deposit successful",
- *             @OA\JsonContent(
- *                 type="object",
- *                 @OA\Property(property="message", type="string", example="Deposit successful")
- *             )
- *         ),
- *         @OA\Response(
- *             response="400",
- *             description="Bad request - Validation errors",
- *             @OA\JsonContent(
- *                 type="object",
- *                 @OA\Property(property="error", type="string", example="Deposit amount missing")
- *             )
- *         ),
- *         @OA\Response(
- *             response="500",
- *             description="Internal server error - Failed to process deposit",
- *             @OA\JsonContent(
- *                 type="object",
- *                 @OA\Property(property="error", type="string", example="Failed to process deposit: [error_message]")
- *             )
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="Deposit successful",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(property="message", type="string", example="Deposit successful")
  *         )
- *     },
- *     security={
- *         {
- *             "BearerAuth": {}
- *         }
- *     }
+ *     ),
+ *     @OA\Response(
+ *         response=400,
+ *         description="Bad request - Validation errors",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(property="error", type="string", example="Deposit amount missing")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=500,
+ *         description="Internal server error - Failed to process deposit",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(property="error", type="string", example="Failed to process deposit: [error_message]")
+ *         )
+ *     )
  * )
  */
+
 class TransactionController {
     public function deposit(){
             $data = Flight::request()->data->getData();
@@ -109,7 +106,9 @@ class TransactionController {
      *     description="Withdraws a specified amount from the user's account after validating the withdrawal amount and checking for sufficient balance.",
      *     operationId="withdraw",
      *     tags={"Transactions"},
-     *     requestBody={
+     *     security={{"BearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
      *         @OA\MediaType(
      *             mediaType="application/json",
      *             @OA\Schema(
@@ -119,44 +118,39 @@ class TransactionController {
      *                     property="amount",
      *                     type="number",
      *                     format="float",
-     *                     description="The amount to withdraw"
+     *                     description="The amount to withdraw",
+     *                     example=75.00
      *                 )
      *             )
      *         )
-     *     },
-     *     responses={
-     *         @OA\Response(
-     *             response="200",
-     *             description="Withdrawal successful",
-     *             @OA\JsonContent(
-     *                 type="object",
-     *                 @OA\Property(property="message", type="string", example="Withdrawal successful")
-     *             )
-     *         ),
-     *         @OA\Response(
-     *             response="400",
-     *             description="Bad request - Validation errors or insufficient balance",
-     *             @OA\JsonContent(
-     *                 type="object",
-     *                 @OA\Property(property="error", type="string", example="Withdrawal amount missing")
-     *             )
-     *         ),
-     *         @OA\Response(
-     *             response="500",
-     *             description="Internal server error - Failed to process withdrawal",
-     *             @OA\JsonContent(
-     *                 type="object",
-     *                 @OA\Property(property="error", type="string", example="Failed to process withdrawal: [error_message]")
-     *             )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Withdrawal successful",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="Withdrawal successful")
      *         )
-     *     },
-     *     security={
-     *         {
-     *             "BearerAuth": {}
-     *         }
-     *     }
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Bad request - Validation errors or insufficient balance",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="error", type="string", example="Withdrawal amount missing")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error - Failed to process withdrawal",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="error", type="string", example="Failed to process withdrawal: insufficient balance")
+     *         )
+     *     )
      * )
      */
+
     public function withdraw(){
         $data = Flight::request()->data->getData();
 
@@ -230,7 +224,7 @@ class TransactionController {
      *     summary="Get account summary",
      *     description="Retrieve a summary of the user's account details, including transaction history and current balance.",
      *     tags={"Transactions"},
-     *     security={{"bearerAuth":{}}},
+     *     security={{"BearerAuth":{}}},
      *     @OA\Response(
      *         response=200,
      *         description="Summary of user's account",
@@ -259,6 +253,7 @@ class TransactionController {
      *     )
      * )
      */
+
     public function summary(){
         JwtMiddleware::verify();
         $userId = Flight::get('userId');
