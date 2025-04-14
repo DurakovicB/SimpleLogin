@@ -104,25 +104,45 @@ This document outlines the work completed during the 7-day Junior Backend Develo
     composer install
     ```
 
-3. **Setup the `.env` file:**
+3. **Setup Environment Variables:**
    - Copy the `.env.example` file to `.env`.
    - Update the `.env` file with your local database credentials and JWT secret.
 
 4. **Install and Set Up MySQL:**
 
-    - Install MySQL Server 8.0.33 (if not already installed).
-
-    - Create a new database for the application by running the following commands:
+    - Install MySQL Server 8.0.33 - or the nearest version available (if not already installed).
+    https://dev.mysql.com/downloads/installer/
+    
+    - You can also install MySQL Workbench (or any database management tool compatible with MySQL):
+    https://dev.mysql.com/downloads/workbench/
+    
+    - Create a MySQL connection
 
 5.  **Run the SQL Script to Set Up the Database Schema:**
 
-1. Run the schema creation script  `/database/setup_database.sql` as a MySQL query.
+    - Run the schema creation script  `/database/setup_database.sql` as a MySQL query.
 
 
-## Run the server:
+6.  **Run the server - PHP:**
+    - The project was built using PHP 8.0.29; 8.1 works fine as well.
+    Download ZIP (for Windows):
+    https://windows.php.net/downloads/releases/php-8.1.32-Win32-vs16-x64.zip
 
-```bash
-php -S localhost:8000 -t public
+    -Start the local server:
+    ```bash
+    php -S localhost:8000 -t public
+    ```
 
-php version 8.0.29
-./vendor/bin/phpunit
+7.  **Run Tests**
+    - You must have the server running and the database properly set up with test data.
+
+    ***For Bash/Linux/Mac:***
+    ```bash
+    ./vendor/bin/phpunit --debug
+    ```
+
+    ***For Windows CMD:***
+    ```cmd
+    php -d memory_limit=512M vendor\bin\phpunit --debug
+    ```
+    - Using --debug will show which tests are being run.
