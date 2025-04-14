@@ -21,6 +21,9 @@ Flight::route('POST /auth/login', ['UserController', 'login']);
 Flight::route('GET /users/info', function () {
     JwtMiddleware::verify();
     $userId = Flight::get('userId');
+    if (!$userId) {
+        return; 
+    }
 
     $db = Database::getInstance();
     $stmt = $db->prepare("SELECT id, username, email FROM users WHERE id = :id");
@@ -41,6 +44,12 @@ Flight::route('POST /transactions/deposit', function() {
     if (!isset($data['amount'])){
         Flight::response()->status(400);
         Flight::json(['error' => 'Deposit amount missing']);
+        return;
+    }
+
+    if (!is_numeric($data['amount']) || filter_var($data['amount'], FILTER_VALIDATE_FLOAT) === false) {
+        Flight::response()->status(400);
+        Flight::json(['error' => 'Amount must be a valid number']);
         return;
     }
 
@@ -77,17 +86,31 @@ Flight::route('POST /transactions/deposit', function() {
 
 Flight::route('POST /transactions/withdraw', function() {
     $data = Flight::request()->data->getData();
-    $withdrawAmount = $data['amount'];
 
-    if (!isset($withdrawAmount) || $withdrawAmount <= 0) {
+    if (!isset($data['amount'])){
+        Flight::response()->status(400);
+        Flight::json(['error' => 'Withdrawal amount missing']);
+        return;
+    }
+
+    if ($data['amount'] <= 0) {
         Flight::response()->status(400);
         Flight::json(['error' => 'Invalid withdrawal amount']);
         return;
     }
 
-    JwtMiddleware::verify(); 
-    $userId = Flight::get('userId');
+    if (!is_numeric($data['amount']) || filter_var($data['amount'], FILTER_VALIDATE_FLOAT) === false) {
+        Flight::response()->status(400);
+        Flight::json(['error' => 'Amount must be a valid number']);
+        return;
+    }
 
+    JwtMiddleware::verify(); 
+    $userId = Flight::get('userId');    
+    if (!$userId) {
+        return; 
+    }
+    
     $db = Database::getInstance();
     try {
         $db->beginTransaction();
@@ -106,7 +129,7 @@ Flight::route('POST /transactions/withdraw', function() {
         $totalWithdrawal = $result['total_withdrawal'] ?? 0;
         $currentBalance = $totalDeposit - $totalWithdrawal;
 
-        if ($currentBalance < $withdrawAmount) {
+        if ($currentBalance < $data['amount']) {
             Flight::response()->status(400);
             Flight::json(['error' => 'Insufficient balance']);
             return;
@@ -115,7 +138,7 @@ Flight::route('POST /transactions/withdraw', function() {
         //sufficiet funds
         $stmt = $db->prepare("INSERT INTO transactions (user_id, type, amount) VALUES (:userId, 'withdraw', :amount)");
         $stmt->bindParam(':userId', $userId);
-        $stmt->bindParam(':amount', $withdrawAmount);
+        $stmt->bindParam(':amount', $data['amount']);
         $stmt->execute();
 
         $db->commit();
@@ -131,6 +154,9 @@ Flight::route('POST /transactions/withdraw', function() {
 Flight::route('GET /transactions/summary', function() {
     JwtMiddleware::verify();
     $userId = Flight::get('userId');
+    if (!$userId) {
+        return; 
+    }
 
     $db = Database::getInstance();
     try {
