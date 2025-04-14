@@ -228,6 +228,7 @@ class TransactionController {
      * @OA\Get(
      *     path="/transactions/summary",
      *     summary="Get account summary",
+     *     description="Retrieve a summary of the user's account details, including transaction history and current balance.",
      *     tags={"Transactions"},
      *     security={{"bearerAuth":{}}},
      *     @OA\Response(

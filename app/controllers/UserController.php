@@ -22,6 +22,7 @@ class UserController {
      * @OA\Post(
      *     path="/auth/register",
      *     summary="Register a new user",
+     *     description="Create a new user account by providing necessary information - username, password, and email.",
      *     tags={"Authentication"},
      *     @OA\RequestBody(
      *         required=true,
@@ -163,6 +164,7 @@ class UserController {
      * @OA\Post(
      *     path="/auth/login",
      *     summary="Log in a user",
+     *     description="Authenticate a user by verifying credentials (username/email and password) and return a JWT token.",
      *     tags={"Authentication"},
      *     @OA\RequestBody(
      *         required=true,
