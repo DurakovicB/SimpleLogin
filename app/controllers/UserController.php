@@ -1,8 +1,68 @@
 <?php
 use \Firebase\JWT\JWT;
 use ZxcvbnPhp\Zxcvbn;
+use OpenApi\Annotations as OA;
+
+    /**
+     * @OA\Info(
+     *     version="1.0.0",
+     *     title="SimpleLogin API",
+     *     description="A simple login/register API"
+     * )
+     *
+     * @OA\Server(
+     *     url="http://localhost:8000",
+     *     description="Local development server"
+     * )
+     */
 
 class UserController {
+
+    /**
+     * @OA\Post(
+     *     path="/auth/register",
+     *     summary="Register a new user",
+     *     tags={"Authentication"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"email", "password", "username"},
+     *             @OA\Property(property="email", type="string", format="email", example="user@example.com"),
+     *             @OA\Property(property="password", type="string", example="SecurePass123!"),
+     *             @OA\Property(property="username", type="string", example="new_user")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="User registered successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="User registered successfully")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Invalid input or validation error",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="error", type="string", example="Email, password, and username are required")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=409,
+     *         description="Email or username already exists",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="error", type="string", example="Email already exists")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Server error",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="error", type="string", example="Error registering user")
+     *         )
+     *     )
+     * )
+     */
+
     public function register() {
         $data = Flight::request()->data->getData();
 
@@ -99,6 +159,50 @@ class UserController {
             Flight::json(['error' => 'Error registering user'], 500);
         }
     }   
+    /**
+     * @OA\Post(
+     *     path="/auth/login",
+     *     summary="Log in a user",
+     *     tags={"Authentication"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(
+     *                 property="email",
+     *                 type="string",
+     *                 format="email",
+     *                 example="user@example.com"
+     *             ),
+     *             @OA\Property(
+     *                 property="username",
+     *                 type="string",
+     *                 example="user123"
+     *             ),
+     *             @OA\Property(
+     *                 property="password",
+     *                 type="string",
+     *                 example="SecurePass123!"
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Login successful",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Login successful"),
+     *             @OA\Property(property="token", type="string", example="your.jwt.token.here")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Invalid credentials or missing fields",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="error", type="string", example="Email/username and password are required")
+     *         )
+     *     )
+     * )
+     */
 
     public function login() {
         $data = Flight::request()->data->getData();
