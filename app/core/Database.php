@@ -19,4 +19,16 @@ class Database {
         }
         return self::$instance->pdo;
     }
+
+    public static function cleanupTestUsers($email, $username) {
+        $db = self::getInstance();  
+
+        $stmt = $db->prepare("DELETE FROM users WHERE email = :email");
+        $stmt->bindParam(':email', $email);
+        $stmt->execute();
+
+        $stmt = $db->prepare("DELETE FROM users WHERE username = :username");
+        $stmt->bindParam(':username', $username);
+        $stmt->execute();
+    }
 }
