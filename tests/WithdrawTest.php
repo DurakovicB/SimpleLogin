@@ -127,6 +127,19 @@ class WithdrawTest extends TestCase
         $this->assertEquals('Invalid withdrawal amount', $response['error']);
     }
 
+    public function testSqlInjectionAttempt()
+    {
+        $payload = json_encode(['amount' => "100; DROP TABLE users;"]);
+
+        $response = $this->sendRequest("{$this->baseUrl}/transactions/withdraw", $payload, [
+            "Authorization: Bearer {$this->token}"
+        ]);
+
+        $this->assertArrayHasKey('error', $response);
+        $this->assertEquals('Amount must be a valid number', $response['error']);
+    }
+
+
     public function testWithdrawalInsufficientFunds()
     {
         $payload = json_encode(['amount' => 999999]);
