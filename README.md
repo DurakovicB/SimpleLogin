@@ -95,14 +95,21 @@ This document outlines the work completed during the 7-day Junior Backend Develo
 ## API Usage Instructions
 
 1. **Clone the repository:**
+
+    > If you don't have Git installed, download it from [git-scm.com](https://git-scm.com/downloads)
+
     ```bash
     git clone https://github.com/DurakovicB/SimpleLogin.git
     ```
 
 2. **Install dependencies:**
+
+    > If you don't have Composer installed, download it from [getcomposer.org](https://getcomposer.org/download/)
+
     ```bash
     composer install
     ```
+
 
 3. **Setup Environment Variables:**
    - Copy the `.env.example` file to `.env`.
